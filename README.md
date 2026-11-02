@@ -30,6 +30,7 @@ The goal is not only to ask whether history helps, but also **how much prior his
 ```text
 Customer-History-Fraud-Detection/
 ├── data/
+│   ├── bs140513_032310.csv
 │   └── README.md
 ├── experiments/
 │   └── banksim_history_experiment.py
@@ -42,20 +43,20 @@ Customer-History-Fraud-Detection/
 
 ## Dataset
 
-The raw BankSim CSV is intentionally not committed to this repository.
-
-Download the BankSim transaction file and place it locally at:
+The verified BankSim CSV is included in this repository at:
 
 ```text
 data/bs140513_032310.csv
 ```
 
-Expected dataset characteristics:
+Verified characteristics:
 
 - 594,643 transactions
 - 4,112 customers
 - 7,200 fraud transactions
 - `step` values covering days 0-179
+
+The import workflow validates these counts before committing the dataset.
 
 ## Install
 
@@ -81,4 +82,4 @@ The script saves:
 
 ## Current status
 
-Experiment design and implementation are prepared. The next step is to run the locked experiment on the BankSim CSV and inspect the measured improvement by available customer-history length.
+Dataset, experiment design, and implementation are now in the repository. The next step is to run the locked experiment and inspect the measured improvement by available customer-history length.
