@@ -1,0 +1,22 @@
+# Raw/local datasets
+data/*.csv
+data/*.zip
+
+# Generated experiment outputs
+results/*
+!results/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# CatBoost
+catboost_info/
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
