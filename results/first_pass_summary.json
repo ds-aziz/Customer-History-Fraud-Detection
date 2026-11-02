@@ -1,0 +1,46 @@
+{
+  "rows": 594643,
+  "customers": 4112,
+  "fraud_rows": 7200,
+  "split_customers": {
+    "train": 2878,
+    "validation": 617,
+    "test": 617
+  },
+  "overall": {
+    "simple": {
+      "n": 87253,
+      "fraud_n": 1040,
+      "fraud_rate": 0.011919360938878892,
+      "pr_auc": 0.8744048489233158,
+      "roc_auc": 0.9883071411236392,
+      "precision": 0.8469601677148847,
+      "recall": 0.7769230769230769,
+      "f1": 0.8104312938816449,
+      "threshold": 0.34
+    },
+    "history": {
+      "n": 87253,
+      "fraud_n": 1040,
+      "fraud_rate": 0.011919360938878892,
+      "pr_auc": 0.9112354018096566,
+      "roc_auc": 0.9967088445522673,
+      "precision": 0.853585657370518,
+      "recall": 0.8240384615384615,
+      "f1": 0.8385518590998043,
+      "threshold": 0.37
+    },
+    "pr_auc_difference": 0.03683055288634074,
+    "bootstrap": {
+      "mean_difference": 0.03608511648164609,
+      "ci95_low": 0.025355481277882015,
+      "ci95_high": 0.0485936145174623,
+      "n": 100
+    }
+  },
+  "settings": {
+    "iterations": 60,
+    "bootstrap": 100,
+    "note": "Fast first-pass run using the locked experimental design. Confirmatory run should use the repository defaults (500 iterations, 1000 bootstraps)."
+  }
+}
