@@ -102,12 +102,15 @@ def add_past_only_history(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["_row_id"] = np.arange(len(df))
 
+    tmp = df[["customer", "step", "amount"]].copy()
+    tmp["amount_sq"] = tmp["amount"].astype(float) ** 2
+
     daily = (
-        df.groupby(["customer", "step"], as_index=False)
+        tmp.groupby(["customer", "step"], as_index=False)
         .agg(
             day_txn_count=("amount", "size"),
             day_amount_sum=("amount", "sum"),
-            day_amount_sumsq=("amount", lambda s: float(np.square(s).sum())),
+            day_amount_sumsq=("amount_sq", "sum"),
             day_amount_max=("amount", "max"),
             day_amount_mean=("amount", "mean"),
         )
@@ -297,45 +300,49 @@ def customer_bootstrap_pr_auc(
     n_bootstrap,
     seed,
 ):
+    """
+    Paired customer-level bootstrap using sample weights.
+
+    Sampling customers with replacement is equivalent to assigning each
+    transaction the bootstrap multiplicity of its customer. This avoids
+    repeatedly concatenating large DataFrames and gives the same paired
+    customer-bootstrap estimand.
+    """
     rng = np.random.default_rng(seed)
 
-    customers = test["customer"].drop_duplicates().to_numpy()
+    customer_codes, customers = pd.factorize(
+        test["customer"],
+        sort=False,
+    )
+    n_customers = len(customers)
 
-    work = test[["customer", "fraud"]].copy()
-    work["simple_probability"] = simple_probabilities
-    work["history_probability"] = history_probabilities
-
-    customer_frames = {
-        customer: group
-        for customer, group in work.groupby("customer", sort=False)
-    }
-
+    y_true = test["fraud"].to_numpy()
     differences = []
 
     for _ in range(n_bootstrap):
-        sampled_customers = rng.choice(
-            customers,
-            size=len(customers),
-            replace=True,
+        sampled = rng.integers(
+            0,
+            n_customers,
+            size=n_customers,
         )
-
-        bootstrap_sample = pd.concat(
-            [customer_frames[c] for c in sampled_customers],
-            ignore_index=True,
+        customer_counts = np.bincount(
+            sampled,
+            minlength=n_customers,
         )
+        weights = customer_counts[customer_codes]
 
-        y_true = bootstrap_sample["fraud"].to_numpy()
-
-        if y_true.sum() == 0:
+        if np.dot(weights, y_true) == 0:
             continue
 
         simple_score = average_precision_score(
             y_true,
-            bootstrap_sample["simple_probability"],
+            simple_probabilities,
+            sample_weight=weights,
         )
         history_score = average_precision_score(
             y_true,
-            bootstrap_sample["history_probability"],
+            history_probabilities,
+            sample_weight=weights,
         )
 
         differences.append(history_score - simple_score)
@@ -356,7 +363,6 @@ def customer_bootstrap_pr_auc(
         "ci95_high": float(np.quantile(differences, 0.975)),
         "bootstrap_replicates": int(len(differences)),
     }
-
 
 def main():
     args = parse_args()
