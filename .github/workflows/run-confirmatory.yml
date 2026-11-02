@@ -1,0 +1,50 @@
+name: Run confirmatory BankSim experiment
+
+on:
+  push:
+    paths:
+      - ".github/workflows/run-confirmatory.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  confirmatory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run 500-iteration 1000-bootstrap experiment
+        run: |
+          rm -rf results/confirmatory
+          python experiments/banksim_history_experiment.py \
+            --csv data/bs140513_032310.csv \
+            --output-dir results/confirmatory \
+            --iterations 500 \
+            --bootstrap 1000 \
+            --seed 42
+
+      - name: Keep compact confirmatory results
+        run: |
+          rm -f results/confirmatory/test_predictions.csv
+          rm -f results/confirmatory/simple_model.cbm
+          rm -f results/confirmatory/history_model.cbm
+
+      - name: Commit confirmatory results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f results/confirmatory/summary.json results/confirmatory/history_group_results.csv
+          git commit -m "Add confirmatory BankSim results"
+          git push
