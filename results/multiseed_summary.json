@@ -1,0 +1,21 @@
+{
+  "purpose": "multi-seed robustness check",
+  "iterations_per_model": 120,
+  "seeds": [11,22,33,44,55],
+  "positive_splits": 5,
+  "total_splits": 5,
+  "mean_simple_pr_auc": 0.8908434976125846,
+  "mean_history_pr_auc": 0.9255403460707259,
+  "mean_pr_auc_difference": 0.0346968484581411,
+  "median_pr_auc_difference": 0.03210566406529192,
+  "min_pr_auc_difference": 0.027866163456931825,
+  "max_pr_auc_difference": 0.047673965216063374,
+  "std_pr_auc_difference": 0.007587572969783049,
+  "results": [
+    {"seed":11,"test_rows":88950,"test_fraud":1086,"simple_pr_auc":0.8922574652791433,"simple_roc_auc":0.9897990893007425,"simple_best_iter":111,"history_pr_auc":0.9201236287360751,"history_roc_auc":0.9973500032026726,"history_best_iter":119,"pr_auc_diff":0.027866163456931825},
+    {"seed":22,"test_rows":89949,"test_fraud":1049,"simple_pr_auc":0.8941082822115589,"simple_roc_auc":0.9893775152510131,"simple_best_iter":107,"history_pr_auc":0.9259817754529654,"history_roc_auc":0.9966084792308493,"history_best_iter":112,"pr_auc_diff":0.031873493241406536},
+    {"seed":33,"test_rows":89730,"test_fraud":1363,"simple_pr_auc":0.8897578681167774,"simple_roc_auc":0.9896387556859204,"simple_best_iter":110,"history_pr_auc":0.9374318333328407,"history_roc_auc":0.99695040993291,"history_best_iter":119,"pr_auc_diff":0.047673965216063374},
+    {"seed":44,"test_rows":89946,"test_fraud":1178,"simple_pr_auc":0.8909491410654906,"simple_roc_auc":0.9882051947397187,"simple_best_iter":109,"history_pr_auc":0.9230548051307825,"history_roc_auc":0.9957150898609206,"history_best_iter":119,"pr_auc_diff":0.03210566406529192},
+    {"seed":55,"test_rows":89332,"test_fraud":1074,"simple_pr_auc":0.8871447313899534,"simple_roc_auc":0.9920493066860477,"simple_best_iter":113,"history_pr_auc":0.9211096877009652,"history_roc_auc":0.9961298500464589,"history_best_iter":118,"pr_auc_diff":0.03396495631101182}
+  ]
+}
