@@ -1,0 +1,63 @@
+{
+  "rows": 594643,
+  "customers": 4112,
+  "fraud_rows": 7200,
+  "split_customers": {
+    "train": 2878,
+    "validation": 617,
+    "test": 617
+  },
+  "simple_features": [
+    "age",
+    "gender",
+    "merchant",
+    "category",
+    "amount"
+  ],
+  "history_features": [
+    "age",
+    "gender",
+    "merchant",
+    "category",
+    "amount",
+    "previous_transaction_count",
+    "previous_amount_mean",
+    "previous_amount_std",
+    "previous_amount_max",
+    "previous_day_amount_mean",
+    "amount_vs_previous_mean",
+    "has_previous_history"
+  ],
+  "same_day_rule": "History uses only transactions from strictly earlier step/day values.",
+  "overall": {
+    "simple": {
+      "n": 87253,
+      "fraud_n": 1040,
+      "fraud_rate": 0.011919360938878892,
+      "pr_auc": 0.8941621614998698,
+      "roc_auc": 0.9968948831115064,
+      "precision": 0.8433734939759037,
+      "recall": 0.8076923076923077,
+      "f1": 0.825147347740668,
+      "threshold": 0.36000000000000004
+    },
+    "history": {
+      "n": 87253,
+      "fraud_n": 1040,
+      "fraud_rate": 0.011919360938878892,
+      "pr_auc": 0.9369578839081112,
+      "roc_auc": 0.998585340734799,
+      "precision": 0.8557784145176696,
+      "recall": 0.8615384615384616,
+      "f1": 0.8586487781504551,
+      "threshold": 0.4
+    },
+    "pr_auc_difference_history_minus_simple": 0.042795722408241366,
+    "customer_bootstrap_pr_auc_difference": {
+      "mean_difference": 0.04187605651740273,
+      "ci95_low": 0.030735500903103764,
+      "ci95_high": 0.05233255654144101,
+      "bootstrap_replicates": 1000
+    }
+  }
+}
