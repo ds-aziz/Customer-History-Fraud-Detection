@@ -2,40 +2,63 @@
 
 ## 30-second version
 
-I am studying a focused fraud-detection question:
+Prior research already shows that customer transaction history can improve fraud detection, so my project does not treat that as a new discovery.
 
-**When does customer-specific transaction history become useful enough to improve fraud detection?**
+My question is narrower:
 
-I compare two models under the same conditions: a **Simple model** using only the current transaction, and a **History model** using the same current information plus strictly past customer behavior.
+**Is there a stable amount of customer history after which personalization becomes reliably useful, or is that point dataset-dependent?**
 
-On BankSim, the History model improved fraud detection across multiple unseen-customer splits. I then repeated the same idea on Sparkov, where the overall improvement was even larger.
+I tested this using the same Simple-vs-History comparison under unseen-customer evaluation and strict leakage control. On BankSim and Sparkov, customer history improved fraud detection overall, but the exact minimum useful-history point did not reproduce across datasets.
 
-The broad result replicated across both datasets: **customer history helps**, but the exact amount of history needed before the benefit becomes stable is **dataset-dependent**.
+So the main result is that **the history benefit is real, but the amount of history required for stable benefit appears to depend on the transaction environment**.
 
 ## 60-second version
 
-My project focuses on a cold-start problem in fraud detection.
+My project studies a cold-start and generalization problem in fraud detection.
 
-Fraud models can benefit from a customer's past behavior, but new customers have very little history. So I asked:
+Previous research already uses historical customer behavior and has also studied low-frequency users, so I do not claim that customer history itself is novel.
 
-**How much previous transaction history is needed before personalized behavior becomes reliably useful?**
+Instead, I ask:
 
-I tested this using a controlled Simple-vs-History design. Both models used the same algorithm. The baseline model received only current-transaction information. The second model received the same information plus features derived strictly from previous customer transactions.
+**How stable is the benefit of customer-specific transaction history across different amounts of available history and across datasets?**
 
-I used customer/card-level train, validation, and test splits, so final-test identities were unseen during training. I also blocked future-information leakage and evaluated performance by available history length.
+I compare two models using the same algorithm: a Simple model with current-transaction information only, and a History model with the same information plus strictly past customer behavior.
 
-On BankSim, the History model improved overall PR-AUC across multiple customer splits. I then repeated the same research question on Sparkov, where the History model again produced a substantial overall improvement.
+The evaluation is customer/card-level, so final-test identities are unseen during training, and future-information leakage is blocked.
 
-The exact minimum useful-history threshold was not identical across the two datasets. That led to the stronger conclusion that **personalized transaction history is useful, but the point at which it becomes stable depends on the transaction environment and dataset**.
+On BankSim, the History model improved PR-AUC across multiple customer splits. On Sparkov, the overall improvement was even larger. However, the exact point at which history became consistently useful was not the same across the two datasets.
 
-## Why this may be research-useful
+That suggests there may not be a universal fixed history threshold. The more interesting research problem is understanding **why the required history length changes across datasets, transaction environments, and models**.
 
-The contribution is not a new fraud-model architecture. The focus is the **measurement problem**:
+## Research contribution
 
-> When does customer history become reliable enough to help?
+The contribution is not a new fraud-model architecture and not the discovery that historical behavior can help.
 
-This is relevant to fraud detection for new or low-history customers, where a system may need to rely more on current-transaction and population-level information until enough individual behavior has accumulated.
+The contribution is a controlled empirical protocol for examining the **stability and generalizability of the history benefit**, using:
 
-## Current limitation
+- same-algorithm Simple-vs-History comparison;
+- unseen-customer/card evaluation;
+- strict leakage prevention;
+- history-length groups;
+- bootstrap uncertainty;
+- repeated customer splits;
+- cross-dataset validation.
 
-Both BankSim and Sparkov are synthetic datasets. The next stronger step would be validation using real transaction data or a more realistic dataset, while keeping the same core research question.
+## Literature-aware positioning
+
+Prior work has already studied:
+
+- customer behavioral profiling;
+- historical transaction sequences;
+- low-frequency / low-history users;
+- sequence/history length effects.
+
+Reported useful-history lengths differ between studies and datasets.
+
+My current result is therefore best interpreted as evidence that **the useful-history point is not necessarily universal**.
+
+## Current limitation and MS direction
+
+BankSim and Sparkov are both synthetic datasets.
+
+A stronger MS-level continuation would test the same controlled question on real transaction data and investigate which factors determine how much customer history is needed before personalized fraud detection becomes reliable.
