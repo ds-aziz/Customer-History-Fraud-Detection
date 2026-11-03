@@ -106,19 +106,27 @@ python experiments/banksim_history_experiment.py \
 
 ## Main finding
 
-Across BankSim and Sparkov, the History model outperformed the Simple model overall.
+Across both datasets, the History model consistently outperformed the Simple model overall.
 
-However, the exact history length at which the benefit became stable was **not the same across datasets**.
+### BankSim
+- History better in **5/5** customer splits
+- mean PR-AUC gain about **+0.0347**
+- first fully consistent positive range: **11–20** previous transactions
 
-That means the strongest conclusion is not:
+### Sparkov
+- History better in **5/5** card splits
+- mean Simple PR-AUC: **0.5055**
+- mean History PR-AUC: **0.7884**
+- mean PR-AUC gain: **+0.2829**
+- gain range: **+0.2161 to +0.4455**
+- the earlier single-split negative result for **11–20** did not repeat; it was positive in **5/5** robustness splits
+- **21+** had the strongest and most statistically stable group-level evidence
 
-> “11 previous transactions are enough.”
+The strongest conclusion is:
 
-Instead, it is:
+> **Customer-specific history provides a robust overall benefit, but the exact history length required before that benefit becomes statistically stable is dataset-dependent.**
 
-> **Customer-specific history can improve fraud detection, but the amount of history required for a stable benefit appears to be dataset- and environment-dependent.**
-
-This agrees with the broader literature, where reported useful-history lengths vary across methods and datasets.
+This means the project does not claim one universal cutoff such as “11 transactions.”
 
 ## What this project adds
 
@@ -131,7 +139,8 @@ Its main evidence comes from:
 - history-length groups;
 - customer-level bootstrap uncertainty;
 - repeated BankSim customer splits;
-- Sparkov cross-dataset validation.
+- Sparkov cross-dataset validation;
+- Sparkov multi-seed robustness validation with aligned baseline features and group-level bootstrap uncertainty.
 
 ## Current status
 
