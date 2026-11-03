@@ -1,0 +1,41 @@
+{
+  "rows": 1048575,
+  "cards": 943,
+  "fraud_rows": 6006,
+  "split_cards": {
+    "train": 660,
+    "validation": 141,
+    "test": 142
+  },
+  "overall": {
+    "simple": {
+      "n": 161882,
+      "fraud_n": 948,
+      "fraud_rate": 0.005856117418860652,
+      "pr_auc": 0.5812761358869842,
+      "roc_auc": 0.9741020003797453,
+      "precision": 0.6349557522123894,
+      "recall": 0.6054852320675106,
+      "f1": 0.6198704103671706,
+      "threshold": 0.26
+    },
+    "history": {
+      "n": 161882,
+      "fraud_n": 948,
+      "fraud_rate": 0.005856117418860652,
+      "pr_auc": 0.8225178544330203,
+      "roc_auc": 0.9914776566162118,
+      "precision": 0.8472049689440994,
+      "recall": 0.7194092827004219,
+      "f1": 0.778094694808899,
+      "threshold": 0.25
+    },
+    "pr_auc_difference_history_minus_simple": 0.24124171854603604,
+    "customer_bootstrap_pr_auc_difference": {
+      "mean_difference": 0.24009101322051446,
+      "ci95_low": 0.21001991793446426,
+      "ci95_high": 0.2716443206251525,
+      "bootstrap_replicates": 300
+    }
+  }
+}
