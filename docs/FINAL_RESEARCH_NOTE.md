@@ -2,21 +2,51 @@
 
 ## Title
 
-**When Does Customer Transaction History Become Useful for Fraud Detection? A Controlled Study on BankSim and Sparkov**
+**How Stable Is the Benefit of Customer Transaction History for Fraud Detection? A Controlled Cross-Dataset Study on BankSim and Sparkov**
 
 ## 1. Research problem
 
-Fraud-detection systems often benefit from customer-specific behavioral information. However, a practical difficulty appears for new or low-history customers: very little past behavior is available.
+Fraud-detection research has long used customer-specific historical behavior. Prior work has already shown that previous transactions can improve fraud detection, and the difficulty of profiling low-frequency or low-history users is also well known.
 
-This project studies a focused question:
+Therefore, this project does **not** claim that “customer history helps fraud detection” is a new discovery.
 
-> **Does customer-specific past transaction behavior improve fraud detection, and how much previous history is needed before that benefit becomes reliable?**
+The narrower question studied here is:
 
-The aim is not to invent a new fraud-detection algorithm. The aim is to measure when personalized customer history becomes useful.
+> **Is there a stable or universal point at which customer-specific transaction history becomes reliably useful for fraud detection, or does that point depend on the dataset and transaction environment?**
+
+The aim is to measure the **stability and reproducibility** of the history benefit under a controlled protocol.
 
 ---
 
-## 2. Core experimental idea
+## 2. Positioning against prior work
+
+Several lines of prior research are directly relevant.
+
+### Historical behavior is already established
+
+Previous fraud-detection systems have compared current activity against a customer's past behavior, built customer behavioral profiles, or learned sequential representations from historical transactions.
+
+### Low-history / low-frequency users are already a known problem
+
+Prior studies have explicitly addressed users with few historical transactions. For example, low-frequency transaction methods and behavior-profiling approaches try to supplement sparse personal history with group or contextual information.
+
+### History length has also been studied before
+
+Some sequence-based and behavior-based fraud studies vary the amount of available transaction history, use explicit sequence lengths, or discuss how much historical coverage is needed.
+
+Reported useful-history lengths differ substantially between studies and datasets. This means it is not scientifically safe to claim that a single universal number of prior transactions is already established.
+
+### Gap targeted by this project
+
+The gap examined here is narrower:
+
+> **When a current-transaction-only model and a history-augmented model are compared under the same algorithm, with unseen-customer evaluation and leakage control, how stable is the history benefit across history lengths, random customer splits, and different datasets?**
+
+This is the contribution tested in this repository.
+
+---
+
+## 3. Core experimental idea
 
 Two fraud-detection models are compared under the same conditions.
 
@@ -28,11 +58,11 @@ Uses information from the current transaction only.
 
 Uses the same current-transaction information plus features derived from the customer's strictly past transactions.
 
-The same CatBoost model family is used for both models. This keeps the comparison controlled: the main difference between the two systems is the presence or absence of customer-history information.
+The same CatBoost model family is used for both models. This keeps the comparison controlled: the main experimental difference is the presence or absence of customer-history information.
 
 ---
 
-## 3. History features
+## 4. History features
 
 The History Model uses behavioral summaries such as:
 
@@ -42,70 +72,68 @@ The History Model uses behavioral summaries such as:
 - previous maximum transaction amount;
 - recent previous transaction behavior;
 - current amount relative to the customer's previous average;
-- whether any prior customer history is available.
+- whether prior customer history exists.
 
-Previous fraud labels are not used as customer-history features.
+Previous fraud labels are not used as history features.
 
 ---
 
-## 4. Leakage control
-
-A central requirement of the experiment is that no future information may be used.
+## 5. Leakage control
 
 For every transaction, history features are created only from earlier transactions.
 
 ### BankSim
 
-BankSim provides day-level ordering. Therefore, a transaction on day *t* may use only information from days strictly earlier than *t*. Transactions from the same day are not treated as ordered history.
+BankSim provides day-level ordering. Therefore, a transaction on day *t* may use only information from days strictly earlier than *t*. Same-day transactions are not treated as ordered history.
 
 ### Sparkov
 
-Sparkov provides transaction timestamps / ordering, so history is built from strictly earlier transactions for the same card.
+Sparkov provides transaction ordering/timestamps, so history is built only from earlier transactions for the same card.
 
 This prevents future-information leakage from artificially improving the History Model.
 
 ---
 
-## 5. Customer-level evaluation
+## 6. Unseen-customer/card evaluation
 
 The datasets are split by customer/card rather than by individual transaction.
 
-This means final-test customers/cards are unseen during model training.
-
-The purpose is to test whether the approach works on new customers rather than simply memorizing customers already present in the training set.
-
-The approximate split is:
+Approximate split:
 
 - 70% customers/cards: training
 - 15%: validation
 - 15%: final test
 
+Final-test identities are completely unseen during training.
+
+This makes the evaluation stricter than a random transaction split and reduces the chance that performance is driven by memorizing customer identities.
+
 ---
 
-## 6. Main evaluation metric
+## 7. Evaluation metrics
 
-The primary metric is **PR-AUC / Average Precision**.
+Primary metric:
 
-Fraud is rare compared with normal transactions, so ordinary accuracy can be misleading. PR-AUC focuses more directly on performance for the minority fraud class.
+- **PR-AUC / Average Precision**
 
-Secondary metrics include:
+Secondary metrics:
 
 - ROC-AUC
 - Precision
 - Recall
-- F1 score
+- F1
+
+PR-AUC is emphasized because fraud is highly imbalanced.
 
 ---
 
-# 7. BankSim experiment
+# 8. BankSim experiment
 
 BankSim contains:
 
 - **594,643 transactions**
 - **4,112 customers**
 - **7,200 fraud transactions**
-
-The detailed confirmatory test used completely unseen final-test customers.
 
 ## Overall BankSim result
 
@@ -114,17 +142,17 @@ The detailed confirmatory test used completely unseen final-test customers.
 | Simple Model | 0.8942 | 0.8077 | 0.8251 |
 | History Model | **0.9370** | **0.8615** | **0.8586** |
 
-The History Model improved PR-AUC by approximately:
+PR-AUC gain:
 
 **+0.0428**
 
-A customer-level bootstrap analysis produced a positive confidence interval, supporting the conclusion that the overall gain was unlikely to be only a random split effect.
+A customer-level bootstrap analysis supported a positive overall difference.
 
 ---
 
-## 8. BankSim robustness across multiple customer splits
+## 9. BankSim robustness across customer splits
 
-Five different customer splits were tested.
+Five different unseen-customer splits were tested.
 
 | Seed | Simple PR-AUC | History PR-AUC | Gain |
 |---:|---:|---:|---:|
@@ -134,19 +162,19 @@ Five different customer splits were tested.
 | 44 | 0.8909 | 0.9231 | +0.0321 |
 | 55 | 0.8871 | 0.9211 | +0.0340 |
 
-The History Model was better in **5 out of 5 splits**.
+The History Model was better in **5/5 splits**.
 
-Mean PR-AUC gain across these runs:
+Mean PR-AUC gain:
 
 **approximately +0.0347**
 
-This showed that the overall effect was not limited to a single lucky customer split.
+This supports the stability of the **overall** history benefit on BankSim.
 
 ---
 
-# 9. How much history was needed on BankSim?
+# 10. BankSim history-length pattern
 
-Transactions were grouped according to the amount of previous customer history available:
+Transactions were grouped by available previous history:
 
 - 0
 - 1
@@ -156,7 +184,7 @@ Transactions were grouped according to the amount of previous customer history a
 - 11–20
 - 21+
 
-Across multiple customer splits, the pattern was:
+Across multiple customer splits:
 
 | Previous transactions | Positive splits | Mean PR-AUC gain | Interpretation |
 |---|---:|---:|---|
@@ -168,25 +196,15 @@ Across multiple customer splits, the pattern was:
 | 11–20 | 5/5 | +0.0238 | Consistently positive |
 | 21+ | 5/5 | +0.0520 | Strong consistently positive |
 
-On BankSim, the first history range that produced a positive gain in all five tested splits was **11–20 previous transactions**.
+On BankSim, the first range with a positive gain in all five tested splits was **11–20 previous transactions**.
 
-However, this was treated as a dataset-specific observation rather than a universal rule.
+This is treated only as a **BankSim-specific observation**, not as a universal threshold.
 
 ---
 
-# 10. External validation on Sparkov
+# 11. Sparkov cross-dataset validation
 
-A second dataset was used to check whether the broad finding was specific to BankSim.
-
-Sparkov provides repeated card-level transactions with:
-
-- card identifier;
-- transaction ordering/time;
-- transaction amount;
-- merchant/category information;
-- fraud labels.
-
-The same Simple-vs-History research question was tested.
+Sparkov was used to test whether the broad pattern was unique to BankSim.
 
 The Sparkov run used:
 
@@ -216,13 +234,11 @@ Customer-level bootstrap:
 - mean gain: **+0.2401**
 - 95% CI: **+0.2100 to +0.2716**
 
-This strongly supported the broad finding that customer/card history can improve fraud detection.
+The broad history benefit therefore replicated strongly on a second dataset.
 
 ---
 
-# 11. Sparkov history-length pattern
-
-The history-group results on Sparkov were:
+# 12. Sparkov history-length pattern
 
 | Previous transactions | PR-AUC gain |
 |---|---:|
@@ -234,120 +250,124 @@ The history-group results on Sparkov were:
 | 11–20 | -0.0403 |
 | 21+ | +0.2544 |
 
-Some early/mid-history groups contained very few fraud examples, so individual threshold estimates were unstable.
+Some early/mid-history groups contain very few fraud examples, making their individual estimates unstable.
 
-Most importantly, the exact BankSim threshold did **not** reproduce identically on Sparkov.
-
----
-
-# 12. Main cross-dataset finding
-
-The strongest conclusion from the two datasets is:
-
-> **Customer-specific transaction history improves fraud detection overall, but the amount of history required before the benefit becomes stable is dataset-dependent.**
-
-What repeated across both datasets:
-
-- zero or extremely short history was not reliably useful;
-- personalized history improved overall fraud detection;
-- mature customer/card history could provide strong gains.
-
-What did not repeat exactly:
-
-- the exact minimum number of previous transactions required for reliable improvement.
-
-Therefore, the project does **not** claim that “11 transactions” is a universal fraud-detection threshold.
-
-Instead, the broader finding is:
-
-> **The value of personalized customer history depends on how much reliable past behavior is available.**
+Most importantly, the exact BankSim transition point did **not** reproduce identically on Sparkov.
 
 ---
 
-# 13. Interpretation
+# 13. Main cross-dataset result
 
-The result can be understood through a simple behavioral example.
+What replicated:
 
-Suppose a transaction amount is unusually large.
+- the History Model improved overall fraud detection;
+- zero or very short history was not reliably useful;
+- mature history could provide strong gains.
 
-Without customer history, the model only knows that the transaction is large.
+What did **not** replicate exactly:
 
-With sufficient customer history, the model can compare the transaction against the customer's normal spending pattern.
+- one fixed minimum number of previous transactions at which the gain becomes stable.
 
-For a customer who usually spends small amounts, a very large transaction may be highly unusual.
+Therefore:
 
-For another customer who regularly makes large purchases, the same transaction may be normal.
+> **Customer-specific transaction history can improve fraud detection, but the amount of history required for stable benefit appears to depend on the dataset, transaction environment, and modeling setup.**
 
-However, if only one or two previous transactions are available, the estimated “normal behavior” of the customer may be unreliable.
-
-As more transactions accumulate, the customer's behavioral baseline becomes more informative.
-
----
-
-# 14. Contribution of the project
-
-The contribution is not a new machine-learning architecture.
-
-The contribution is a controlled measurement question:
-
-> **When does customer-specific transaction history become useful enough to improve fraud detection?**
-
-The project contributes:
-
-1. a controlled Simple-vs-History comparison;
-2. customer-level unseen evaluation;
-3. strict prevention of future-information leakage;
-4. evaluation by history length;
-5. bootstrap uncertainty analysis;
-6. robustness testing across multiple customer splits;
-7. validation on a second transaction dataset.
+This is the central result of the project.
 
 ---
 
-# 15. Limitations
+# 14. What is and is not novel here
 
-The main limitations are:
+## Not claimed as novel
 
-### Synthetic datasets
+This project does **not** claim novelty for:
 
-Both BankSim and Sparkov are simulated/synthetic transaction datasets.
+- using customer history in fraud detection;
+- behavioral profiling;
+- recognizing low-history users as difficult;
+- the general idea that sequence/history length can affect performance.
 
-Therefore, the findings should not be presented as guaranteed behavior in real banking systems.
+These ideas exist in prior research.
 
-### Dataset-dependent threshold
+## Contribution tested here
 
-The exact amount of history required before the benefit becomes stable differed between datasets.
+The project contributes a controlled empirical study combining:
 
-This suggests that the threshold may depend on:
+1. a same-algorithm Simple-vs-History comparison;
+2. unseen-customer/card evaluation;
+3. strict leakage control;
+4. performance broken down by available history length;
+5. bootstrap uncertainty;
+6. repeated customer splits;
+7. cross-dataset validation.
 
-- transaction patterns;
+The main contribution is therefore about **stability, reproducibility, and generalizability of the history benefit**, not about discovering historical behavior as a new fraud signal.
+
+---
+
+# 15. Interpretation
+
+A customer's behavioral baseline becomes more informative as more transactions accumulate.
+
+But the amount of history required to build a useful baseline can differ because datasets differ in:
+
 - customer behavior;
-- fraud generation process;
+- transaction frequency;
+- fraud prevalence;
+- fraud-generation process;
 - available features;
-- dataset size and fraud prevalence.
+- simulator or data-collection design;
+- model architecture and training protocol.
 
-### Small early-history fraud counts
-
-Some history groups contain relatively few fraud examples, making precise threshold estimation difficult.
+This explains why one universal history cutoff is unlikely to transfer unchanged across all fraud settings.
 
 ---
 
-# 16. Final conclusion
+# 16. Limitations
 
-This project started with a simple question:
+### Both datasets are synthetic
 
-> **Does customer history help fraud detection, and how much history is needed?**
+BankSim and Sparkov are simulated datasets. Cross-dataset replication is useful, but it is not equivalent to real-bank validation.
 
-The experiments showed that customer-specific history can substantially improve fraud detection.
+### Exact threshold remains uncertain
 
-On BankSim, the improvement was positive across multiple unseen-customer splits, with more stable gains appearing once a meaningful amount of customer history had accumulated.
+The exact transition point differed between datasets and some early-history groups contained few fraud cases.
 
-On Sparkov, the overall improvement was even larger, confirming that the broad effect was not unique to BankSim.
+### Literature already contains related history-length work
 
-However, the exact minimum-history threshold differed between datasets.
+Because prior work has already studied low-frequency users and history/sequence length, this project must be presented as a controlled reproducibility/stability study rather than as the first work on history sufficiency.
 
-The most defensible conclusion is:
+---
 
-> **Personalized transaction history is valuable for fraud detection, but its usefulness depends on the amount and reliability of past customer behavior. The exact point at which history becomes reliably useful is dataset-dependent.**
+# 17. Future research direction
 
-This provides a clear basis for future work using real transaction data or more realistic fraud settings.
+The strongest next research question is:
+
+> **How stable is the benefit of customer-specific transaction history across different transaction environments, model families, and real-world datasets, and which factors determine the amount of history required before personalization becomes reliable?**
+
+Potential future work:
+
+- real bank or payment-platform transaction data;
+- additional datasets with clear customer identity and temporal ordering;
+- different model families;
+- formal learning-curve analysis over history length;
+- cold-start strategies that combine personal and population-level behavior;
+- studying why the useful-history point shifts between datasets.
+
+---
+
+# 18. Final conclusion
+
+Prior literature already shows that customer history can help fraud detection.
+
+This project's main result is narrower:
+
+> **The history benefit is reproducible overall, but the point at which it becomes reliably useful is not stable across datasets.**
+
+BankSim and Sparkov both showed clear overall gains from customer-specific history, but they did not support one identical minimum-history threshold.
+
+Therefore, the most defensible conclusion is:
+
+> **There is no evidence here for a universal fixed transaction-history threshold. The amount of history needed for reliable personalization appears to be dataset- and environment-dependent.**
+
+That is the final scientific framing of this project.
