@@ -1,0 +1,28 @@
+{
+  "rows": 1048575,
+  "cards": 943,
+  "fraud_rows": 6006,
+  "base_features": [
+    "age",
+    "gender",
+    "merchant",
+    "category",
+    "amt"
+  ],
+  "seeds": [
+    11,
+    22,
+    33,
+    44,
+    55
+  ],
+  "overall": {
+    "positive_splits": 5,
+    "splits_tested": 5,
+    "mean_simple_pr_auc": 0.5054814445086644,
+    "mean_history_pr_auc": 0.7883718534493447,
+    "mean_pr_auc_gain": 0.28289040894068035,
+    "min_pr_auc_gain": 0.21607232122936437,
+    "max_pr_auc_gain": 0.44548285056748754
+  }
+}
