@@ -24,14 +24,22 @@ jobs:
         run: |
           mkdir -p data
           curl -L --fail --retry 3 "https://huggingface.co/datasets/dazzle-nu/CIS435-CreditCardFraudDetection/resolve/main/fraudTrain.csv" -o data/fraudTrain.csv
-      - name: Run same Simple-vs-History validation
+      - name: Run Sparkov multiseed robustness validation
         run: |
-          python experiments/sparkov_history_experiment.py --csv data/fraudTrain.csv --output-dir results/sparkov --iterations 150 --bootstrap 300
-      - name: Commit validation results
+          python experiments/sparkov_multiseed_validation.py \
+            --csv data/fraudTrain.csv \
+            --output-dir results/sparkov_robustness \
+            --iterations 60 \
+            --seeds 11,22,33,44,55 \
+            --group-bootstrap 200
+      - name: Commit robustness results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f results/sparkov/summary.json results/sparkov/history_group_results.csv
-          git commit -m "Add Sparkov external validation results" || exit 0
+          git add -f results/sparkov_robustness/summary.json \
+                     results/sparkov_robustness/multiseed_overall.csv \
+                     results/sparkov_robustness/multiseed_history_groups.csv \
+                     results/sparkov_robustness/history_group_summary.csv
+          git commit -m "Add Sparkov multiseed robustness results" || exit 0
           git pull --rebase
           git push
