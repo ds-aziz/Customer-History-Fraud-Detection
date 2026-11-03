@@ -91,4 +91,10 @@ See the full cross-dataset research note in [docs/FINAL_RESEARCH_NOTE.md](docs/F
 
 ## Current status
 
-Dataset, experiment design, and implementation are now in the repository. The next step is to run the locked experiment and inspect the measured improvement by available customer-history length.
+The core experiments are complete.
+
+The main finding was validated across multiple BankSim customer splits and then tested again on a second transaction dataset, Sparkov. Across both datasets, customer-specific past transaction behavior improved fraud detection overall.
+
+The exact minimum amount of history required for stable benefit was not identical across datasets, so the project does not claim a universal fixed threshold. The current conclusion is that **customer history is useful, but the point at which it becomes reliably useful is dataset-dependent**.
+
+For the complete methodology, results, cross-dataset validation, and limitations, see [docs/FINAL_RESEARCH_NOTE.md](docs/FINAL_RESEARCH_NOTE.md).
