@@ -80,6 +80,13 @@ The script saves:
 - trained CatBoost models
 - customer-level bootstrap confidence interval for PR-AUC difference
 
+
+## Main finding
+
+Across unseen-customer tests, the History model consistently outperformed the Simple model overall. In the robustness screen, the first history-length group with a positive gain in all five customer splits was **11–20 previous transactions**; the **21+** group showed the strongest average gain.
+
+See the full experimental summary in [docs/FINAL_RESULTS.md](docs/FINAL_RESULTS.md) and the threshold figure in [figures/history_threshold.svg](figures/history_threshold.svg).
+
 ## Current status
 
 Dataset, experiment design, and implementation are now in the repository. The next step is to run the locked experiment and inspect the measured improvement by available customer-history length.
