@@ -206,53 +206,63 @@ This is treated only as a **BankSim-specific observation**, not as a universal t
 
 Sparkov was used to test whether the broad pattern was unique to BankSim.
 
-The Sparkov run used:
+The robustness run used:
 
 - **1,048,575 transactions**
 - **943 cards**
 - **6,006 fraud transactions**
+- five unseen-card splits: **11, 22, 33, 44, 55**
+- aligned baseline features: **age, gender, merchant, category, amount**
 
-Final test set:
+Across the five splits:
 
-- **161,882 transactions**
-- **142 unseen cards**
-- **948 fraud transactions**
+| Seed | Simple PR-AUC | History PR-AUC | Gain |
+|---:|---:|---:|---:|
+| 11 | 0.5338 | 0.7905 | +0.2567 |
+| 22 | 0.4552 | 0.7217 | +0.2665 |
+| 33 | 0.3608 | 0.8062 | +0.4455 |
+| 44 | 0.5663 | 0.7960 | +0.2297 |
+| 55 | 0.6113 | 0.8274 | +0.2161 |
 
-## Overall Sparkov result
+The History Model was better in **5/5 Sparkov splits**.
 
-| Model | PR-AUC | Recall | F1 |
-|---|---:|---:|---:|
-| Simple Model | 0.5813 | 0.6055 | 0.6199 |
-| History Model | **0.8225** | **0.7194** | **0.7781** |
+Mean PR-AUC:
 
-PR-AUC gain:
+- Simple: **0.5055**
+- History: **0.7884**
+- Mean gain: **+0.2829**
 
-**+0.2412**
+Gain range:
 
-Customer-level bootstrap:
+**+0.2161 to +0.4455**
 
-- mean gain: **+0.2401**
-- 95% CI: **+0.2100 to +0.2716**
-
-The broad history benefit therefore replicated strongly on a second dataset.
+This confirms that the overall benefit of customer-specific history is not a single-split accident.
 
 ---
 
-# 12. Sparkov history-length pattern
+# 12. Sparkov history-length robustness
 
-| Previous transactions | PR-AUC gain |
-|---|---:|
-| 0 | -0.0816 |
-| 1 | -0.0112 |
-| 2–3 | +0.0293 |
-| 4–5 | +0.1158 |
-| 6–10 | +0.0428 |
-| 11–20 | -0.0403 |
-| 21+ | +0.2544 |
+Across the same five splits:
 
-Some early/mid-history groups contain very few fraud examples, making their individual estimates unstable.
+| Previous transactions | Positive splits | Mean PR-AUC gain | Splits with bootstrap CI fully above zero |
+|---|---:|---:|---:|
+| 0 | 3/5 | +0.0091 | 0/5 |
+| 1 | 5/5 | +0.1262 | 0/5 |
+| 2–3 | 5/5 | +0.1303 | 2/5 |
+| 4–5 | 5/5 | +0.2015 | 3/5 |
+| 6–10 | 5/5 | +0.0732 | 4/5 |
+| 11–20 | 5/5 | +0.1852 | 2/5 |
+| 21+ | 5/5 | +0.2859 | 5/5 |
 
-Most importantly, the exact BankSim transition point did **not** reproduce identically on Sparkov.
+Important interpretation:
+
+- the earlier single-split negative result for **11–20** did **not** repeat;
+- in the multi-seed run, **11–20 was positive in 5/5 splits**;
+- therefore, the earlier negative point estimate was likely caused by split-specific sampling noise;
+- **21+** was the strongest and most statistically stable Sparkov group;
+- early-history groups can show positive point estimates, but their fraud counts are small, so their confidence intervals are much less stable.
+
+This strengthens the conclusion that the overall history benefit is robust, while a precise universal early-history threshold remains uncertain.
 
 ---
 
