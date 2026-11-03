@@ -83,9 +83,11 @@ The script saves:
 
 ## Main finding
 
-Across unseen-customer tests, the History model consistently outperformed the Simple model overall. In the robustness screen, the first history-length group with a positive gain in all five customer splits was **11–20 previous transactions**; the **21+** group showed the strongest average gain.
+Across BankSim and Sparkov, the History model outperformed the Simple model overall. The broad finding replicated across both datasets: **customer-specific past behavior can improve fraud detection**, especially once a meaningful behavioral history has accumulated.
 
-See the full experimental summary in [docs/FINAL_RESULTS.md](docs/FINAL_RESULTS.md) and the threshold figure in [figures/history_threshold.svg](figures/history_threshold.svg).
+However, the exact minimum amount of history required for stable improvement was **not identical across datasets**. Therefore, the project does not claim a universal threshold such as “11 transactions.” The stronger conclusion is that **history usefulness is real, but the transition point is dataset-dependent**.
+
+See the full cross-dataset research note in [docs/FINAL_RESEARCH_NOTE.md](docs/FINAL_RESEARCH_NOTE.md), the validation summary in [docs/CROSS_DATASET_VALIDATION.md](docs/CROSS_DATASET_VALIDATION.md), and the BankSim threshold figure in [figures/history_threshold.svg](figures/history_threshold.svg).
 
 ## Current status
 
